@@ -4,16 +4,24 @@ import {
   ConverseCommand,
   Message,
 } from "@aws-sdk/client-bedrock-runtime";
-// import { secret } from "encore.dev/config";
+import { secret } from "encore.dev/config";
 import { freeAIChatDB } from "./db";
 import { pruneMessages } from "./message-pruning";
 
-const BEDROCK_MODEL_ID = process.env.BEDROCK_MODEL_ID || "amazon.titan-text-lite-v1";
-const BEDROCK_REGION = process.env.AWS_REGION || "us-east-1";
-const BEDROCK_COST_PER_1K_TOKENS = parseFloat(process.env.BEDROCK_COST_PER_1K_TOKENS || "0.0001");
+// Use Encore secrets with fallback to environment variables for local development
+const BEDROCK_MODEL_ID_SECRET = secret("BEDROCK_MODEL_ID");
+const AWS_REGION_SECRET = secret("AWS_REGION");
+const BEDROCK_COST_SECRET = secret("BEDROCK_COST_PER_1K_TOKENS");
 
-// const AWS_ACCESS_KEY_ID_SECRET = secret("AWS_ACCESS_KEY_ID");
-// const AWS_SECRET_ACCESS_KEY_SECRET = secret("AWS_SECRET_ACCESS_KEY");
+const BEDROCK_MODEL_ID = BEDROCK_MODEL_ID_SECRET() || process.env.BEDROCK_MODEL_ID || "amazon.titan-text-lite-v1";
+const BEDROCK_REGION = AWS_REGION_SECRET() || process.env.AWS_REGION || "us-east-1";
+const BEDROCK_COST_PER_1K_TOKENS = parseFloat(
+  BEDROCK_COST_SECRET() || process.env.BEDROCK_COST_PER_1K_TOKENS || "0.0001"
+);
+
+// Use Encore secrets with fallback to environment variables for local development
+const AWS_ACCESS_KEY_ID_SECRET = secret("AWS_ACCESS_KEY_ID");
+const AWS_SECRET_ACCESS_KEY_SECRET = secret("AWS_SECRET_ACCESS_KEY");
 
 let bedrockClient: BedrockRuntimeClient | null = null;
 
@@ -22,15 +30,15 @@ function getBedrockClient(): BedrockRuntimeClient {
     return bedrockClient;
   }
 
-  // Try Encore secrets first, fall back to environment variables
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  // Try Encore secrets first, fall back to environment variables for local dev
+  const accessKeyId = AWS_ACCESS_KEY_ID_SECRET() || process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = AWS_SECRET_ACCESS_KEY_SECRET() || process.env.AWS_SECRET_ACCESS_KEY;
 
   if (!accessKeyId || !secretAccessKey) {
     throw new Error(
       "AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY using:\n" +
-      "  - Encore secrets: 'encore secret set AWS_ACCESS_KEY_ID' and 'encore secret set AWS_SECRET_ACCESS_KEY'\n" +
-      "  - Or environment variables: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY"
+      "  - Encore secrets (for cloud): 'encore secret set --type local AWS_ACCESS_KEY_ID' and 'encore secret set --type local AWS_SECRET_ACCESS_KEY'\n" +
+      "  - Or environment variables (for local dev): Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in your .env file or environment"
     );
   }
 

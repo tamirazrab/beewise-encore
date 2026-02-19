@@ -1,6 +1,11 @@
+import { secret } from "encore.dev/config";
 import { freeAIChatDB } from "./db";
 
-const DAILY_BUDGET_ALERT_THRESHOLD = parseFloat(process.env.DAILY_BUDGET_ALERT_THRESHOLD || "30");
+// Use Encore secrets with fallback to environment variables for local development
+const DAILY_BUDGET_ALERT_THRESHOLD_SECRET = secret("DAILY_BUDGET_ALERT_THRESHOLD");
+const DAILY_BUDGET_ALERT_THRESHOLD = parseFloat(
+  DAILY_BUDGET_ALERT_THRESHOLD_SECRET() || process.env.DAILY_BUDGET_ALERT_THRESHOLD || "30"
+);
 
 export interface DailyCostSummary {
   date: string;

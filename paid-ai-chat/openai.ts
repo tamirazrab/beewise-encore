@@ -1,7 +1,24 @@
 import OpenAI from "openai";
+import { secret } from "encore.dev/config";
+
+// Use Encore secrets with fallback to environment variables for local development
+const OPENAI_API_KEY_SECRET = secret("OPENAI_API_KEY");
+const OPENAI_MODEL_SECRET = secret("OPENAI_MODEL");
+const OPENAI_INPUT_COST_SECRET = secret("OPENAI_INPUT_COST_PER_1K");
+const OPENAI_OUTPUT_COST_SECRET = secret("OPENAI_OUTPUT_COST_PER_1K");
+
+const openaiApiKey = OPENAI_API_KEY_SECRET() || process.env.OPENAI_API_KEY || "";
+
+// if (!openaiApiKey) {
+//   throw new Error(
+//     "OPENAI_API_KEY not configured. Set it using:\n" +
+//     "  - Encore secrets: 'encore secret set --type local OPENAI_API_KEY'\n" +
+//     "  - Or environment variable: OPENAI_API_KEY"
+//   );
+// }
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
+  apiKey: openaiApiKey,
 });
 
 export interface OpenAIResponse {
@@ -10,9 +27,13 @@ export interface OpenAIResponse {
   costUsd: number;
 }
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const COST_PER_1K_INPUT_TOKENS = parseFloat(process.env.OPENAI_INPUT_COST_PER_1K || "0.15");
-const COST_PER_1K_OUTPUT_TOKENS = parseFloat(process.env.OPENAI_OUTPUT_COST_PER_1K || "0.60");
+const OPENAI_MODEL = OPENAI_MODEL_SECRET() || process.env.OPENAI_MODEL || "gpt-4o-mini";
+const COST_PER_1K_INPUT_TOKENS = parseFloat(
+  OPENAI_INPUT_COST_SECRET() || process.env.OPENAI_INPUT_COST_PER_1K || "0.15"
+);
+const COST_PER_1K_OUTPUT_TOKENS = parseFloat(
+  OPENAI_OUTPUT_COST_SECRET() || process.env.OPENAI_OUTPUT_COST_PER_1K || "0.60"
+);
 
 export async function invokeOpenAI(
   messages: Array<{ role: "system" | "user" | "assistant"; content: string }>

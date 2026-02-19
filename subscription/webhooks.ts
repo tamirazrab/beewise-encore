@@ -1,6 +1,10 @@
 import { api } from "encore.dev/api";
+import { secret } from "encore.dev/config";
 import { subscriptionDB } from "./db";
 import type { Subscription } from "./types";
+
+// Use Encore secrets with fallback to environment variables for local development
+const STRIPE_SECRET_KEY_SECRET = secret("STRIPE_SECRET_KEY");
 
 interface StripeWebhookEvent {
   type: string;
@@ -141,7 +145,17 @@ async function handleTrialWillEnd(event: StripeWebhookEvent) {
 
 async function getStripeCustomer(customerId: string): Promise<any> {
   const stripe = await import("stripe");
-  const stripeClient = new stripe.default(process.env.STRIPE_SECRET_KEY || "");
+  const stripeSecretKey = STRIPE_SECRET_KEY_SECRET() || process.env.STRIPE_SECRET_KEY;
+  
+  // if (!stripeSecretKey) {
+  //   throw new Error(
+  //     "STRIPE_SECRET_KEY not configured. Set it using:\n" +
+  //     "  - Encore secrets: 'encore secret set --type local STRIPE_SECRET_KEY'\n" +
+  //     "  - Or environment variable: STRIPE_SECRET_KEY"
+  //   );
+  // }
+  
+  const stripeClient = new stripe.default(stripeSecretKey || "");
   return await stripeClient.customers.retrieve(customerId);
 }
 

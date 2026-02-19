@@ -1,6 +1,11 @@
+import { secret } from "encore.dev/config";
 import { freeAIChatDB } from "./db";
 
-const MAX_MESSAGES_PER_SESSION = parseInt(process.env.MAX_MESSAGES_PER_SESSION || "20");
+// Use Encore secrets with fallback to environment variables for local development
+const MAX_MESSAGES_PER_SESSION_SECRET = secret("MAX_MESSAGES_PER_SESSION");
+const MAX_MESSAGES_PER_SESSION = parseInt(
+  MAX_MESSAGES_PER_SESSION_SECRET() || process.env.MAX_MESSAGES_PER_SESSION || "20"
+);
 
 export async function pruneMessages(sessionId: string): Promise<void> {
   const messageCount = await freeAIChatDB.queryRow<{ count: number }>`

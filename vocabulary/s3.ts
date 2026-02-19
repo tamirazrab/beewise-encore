@@ -4,13 +4,30 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { secret } from "encore.dev/config";
 
-const S3_BUCKET = process.env.S3_BUCKET_NAME || "beewise-practice-recordings";
-const S3_REGION = process.env.AWS_REGION || "us-east-1";
+// Use Encore secrets with fallback to environment variables for local development
+const S3_BUCKET_SECRET = secret("S3_BUCKET_NAME");
+const AWS_REGION_SECRET = secret("AWS_REGION");
+const AWS_ACCESS_KEY_ID_SECRET = secret("AWS_ACCESS_KEY_ID");
+const AWS_SECRET_ACCESS_KEY_SECRET = secret("AWS_SECRET_ACCESS_KEY");
+
+const S3_BUCKET = S3_BUCKET_SECRET() || process.env.S3_BUCKET_NAME || "beewise-practice-recordings";
+const S3_REGION = AWS_REGION_SECRET() || process.env.AWS_REGION || "us-east-1";
 const SIGNED_URL_EXPIRES_IN = 3600;
+
+// Get AWS credentials for S3 client
+const accessKeyId = AWS_ACCESS_KEY_ID_SECRET() || process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = AWS_SECRET_ACCESS_KEY_SECRET() || process.env.AWS_SECRET_ACCESS_KEY;
 
 const s3Client = new S3Client({
   region: S3_REGION,
+  ...(accessKeyId && secretAccessKey ? {
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  } : {}),
 });
 
 export function generateS3Key(userId: string, sessionId: string, recordingId: string): string {

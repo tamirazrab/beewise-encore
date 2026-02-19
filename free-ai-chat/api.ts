@@ -73,9 +73,18 @@ function validateUUID(id: string, paramName: string = "id"): void {
   if (!id || typeof id !== "string") {
     throw APIError.invalidArgument(`${paramName} is required`);
   }
+  
+  // Check if the literal ":id" placeholder was sent (common Postman/API client mistake)
+  if (id === ":id" || id.startsWith(":")) {
+    throw APIError.invalidArgument(
+      `Invalid ${paramName}: "${id}". The path parameter must be replaced with an actual UUID value. ` +
+      `For example, use /free/sessions/123e4567-e89b-12d3-a456-426614174000/messages instead of /free/sessions/:id/messages`
+    );
+  }
+  
   if (!UUID_REGEX.test(id)) {
     throw APIError.invalidArgument(
-      `${paramName} must be a valid UUID format. Received: "${id}"`
+      `${paramName} must be a valid UUID format (e.g., 123e4567-e89b-12d3-a456-426614174000). Received: "${id}"`
     );
   }
 }
