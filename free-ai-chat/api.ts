@@ -65,6 +65,21 @@ function requireUserID(): string {
   return auth.userID;
 }
 
+/** UUID validation regex pattern */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Validate UUID format and throw appropriate error if invalid */
+function validateUUID(id: string, paramName: string = "id"): void {
+  if (!id || typeof id !== "string") {
+    throw APIError.invalidArgument(`${paramName} is required`);
+  }
+  if (!UUID_REGEX.test(id)) {
+    throw APIError.invalidArgument(
+      `${paramName} must be a valid UUID format. Received: "${id}"`
+    );
+  }
+}
+
 export const freeCreateSession = api(
   { method: "POST", path: "/free/sessions", auth: true },
   async (req: CreateSessionRequest): Promise<CreateSessionResponse> => {
@@ -147,6 +162,9 @@ export const freeGetSession = api(
   { method: "GET", path: "/free/sessions/:id", auth: true },
   async (req: { id: string }): Promise<ConversationSession> => {
     const userID = requireUserID();
+    
+    // Validate UUID format for path parameter
+    validateUUID(req.id, "session id");
 
     const session = await freeAIChatDB.queryRow<ConversationSession>`
       SELECT id, user_id, language_code, total_messages, total_tokens_used,
@@ -168,6 +186,9 @@ export const freeCloseSession = api(
   { method: "POST", path: "/free/sessions/:id/close", auth: true },
   async (req: { id: string }): Promise<ConversationSession> => {
     const userID = requireUserID();
+    
+    // Validate UUID format for path parameter
+    validateUUID(req.id, "session id");
 
     const session = await freeAIChatDB.queryRow<ConversationSession>`
       UPDATE conversation_session
@@ -193,6 +214,9 @@ export const freeDeleteSession = api(
   { method: "DELETE", path: "/free/sessions/:id", auth: true },
   async (req: { id: string }): Promise<void> => {
     const userID = requireUserID();
+    
+    // Validate UUID format for path parameter
+    validateUUID(req.id, "session id");
 
     await freeAIChatDB.exec`
       DELETE FROM conversation_session
@@ -205,6 +229,9 @@ export const freeSendMessage = api(
   { method: "POST", path: "/free/sessions/:id/messages", auth: true },
   async (req: SendMessageRequest & { id: string }): Promise<SendMessageResponse> => {
     const userID = requireUserID();
+    
+    // Validate UUID format for path parameter
+    validateUUID(req.id, "session id");
 
     const session = await freeAIChatDB.queryRow<ConversationSession>`
       SELECT id, user_id, language_code, total_messages, total_tokens_used,
@@ -296,6 +323,9 @@ export const freeGetMessages = api(
     req: { id: string; limit?: number; offset?: number }
   ): Promise<{ messages: ConversationMessage[]; total: number }> => {
     const userID = requireUserID();
+    
+    // Validate UUID format for path parameter
+    validateUUID(req.id, "session id");
 
     const session = await freeAIChatDB.queryRow<{ id: string }>`
       SELECT id FROM conversation_session WHERE id = ${req.id} AND user_id = ${userID}
