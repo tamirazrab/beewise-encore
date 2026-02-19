@@ -1,16 +1,16 @@
 import "./gateway";
 import { api } from "encore.dev/api";
 import { APIError } from "encore.dev/api";
-import { secret } from "encore.dev/config";
+// import { secret } from "encore.dev/config";
 import { getAuthData } from "~encore/auth";
 import { authDB } from "./db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { RegisterRequest, LoginRequest, AuthResponse, User } from "./types";
 
-// Use Encore secrets with fallback to environment variables for local development
-const JWT_SECRET_SECRET = secret("JWT_SECRET");
-const JWT_SECRET = JWT_SECRET_SECRET() || process.env.JWT_SECRET || "change-me-in-production";
+// const JWT_SECRET_SECRET = secret("JWT_SECRET");
+// const JWT_SECRET = JWT_SECRET_SECRET() || process.env.JWT_SECRET || "change-me-in-production";
+const JWT_SECRET = process.env.JWT_SECRET || "change-me-in-production";
 const JWT_EXPIRES_IN = "7d";
 
 export const register = api(

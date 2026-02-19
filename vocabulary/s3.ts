@@ -6,13 +6,14 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { secret } from "encore.dev/config";
 
-// Use Encore secrets with fallback to environment variables for local development
-const S3_BUCKET_SECRET = secret("S3_BUCKET_NAME");
+// Use Encore secrets for AWS credentials and region
+// const S3_BUCKET_SECRET = secret("S3_BUCKET_NAME");
 const AWS_REGION_SECRET = secret("AWS_REGION");
 const AWS_ACCESS_KEY_ID_SECRET = secret("AWS_ACCESS_KEY_ID");
 const AWS_SECRET_ACCESS_KEY_SECRET = secret("AWS_SECRET_ACCESS_KEY");
 
-const S3_BUCKET = S3_BUCKET_SECRET() || process.env.S3_BUCKET_NAME || "beewise-practice-recordings";
+// const S3_BUCKET = S3_BUCKET_SECRET() || process.env.S3_BUCKET_NAME || "beewise-practice-recordings";
+const S3_BUCKET = process.env.S3_BUCKET_NAME || "beewise-practice-recordings";
 const S3_REGION = AWS_REGION_SECRET() || process.env.AWS_REGION || "us-east-1";
 const SIGNED_URL_EXPIRES_IN = 3600;
 

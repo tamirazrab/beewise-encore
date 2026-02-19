@@ -8,16 +8,17 @@ import { secret } from "encore.dev/config";
 import { freeAIChatDB } from "./db";
 import { pruneMessages } from "./message-pruning";
 
-// Use Encore secrets with fallback to environment variables for local development
+// Use Encore secrets for AWS credentials and model ID
 const BEDROCK_MODEL_ID_SECRET = secret("BEDROCK_MODEL_ID");
 const AWS_REGION_SECRET = secret("AWS_REGION");
-const BEDROCK_COST_SECRET = secret("BEDROCK_COST_PER_1K_TOKENS");
+// const BEDROCK_COST_SECRET = secret("BEDROCK_COST_PER_1K_TOKENS");
 
 const BEDROCK_MODEL_ID = BEDROCK_MODEL_ID_SECRET() || process.env.BEDROCK_MODEL_ID || "amazon.titan-text-lite-v1";
 const BEDROCK_REGION = AWS_REGION_SECRET() || process.env.AWS_REGION || "us-east-1";
-const BEDROCK_COST_PER_1K_TOKENS = parseFloat(
-  BEDROCK_COST_SECRET() || process.env.BEDROCK_COST_PER_1K_TOKENS || "0.0001"
-);
+// const BEDROCK_COST_PER_1K_TOKENS = parseFloat(
+//   BEDROCK_COST_SECRET() || process.env.BEDROCK_COST_PER_1K_TOKENS || "0.0001"
+// );
+const BEDROCK_COST_PER_1K_TOKENS = parseFloat(process.env.BEDROCK_COST_PER_1K_TOKENS || "0.0001");
 
 // Use Encore secrets with fallback to environment variables for local development
 const AWS_ACCESS_KEY_ID_SECRET = secret("AWS_ACCESS_KEY_ID");

@@ -1,28 +1,32 @@
-import { secret } from "encore.dev/config";
+// import { secret } from "encore.dev/config";
 
-// Use Encore secrets with fallback to environment variables for local development
-const DAILY_MESSAGE_LIMIT_SECRET = secret("DAILY_MESSAGE_LIMIT");
-const DAILY_TOKEN_LIMIT_SECRET = secret("DAILY_TOKEN_LIMIT");
-const MONTHLY_SESSION_LIMIT_SECRET = secret("MONTHLY_SESSION_LIMIT");
-const MAX_MESSAGES_PER_SESSION_SECRET = secret("MAX_MESSAGES_PER_SESSION");
-const MAX_TOKENS_PER_REQUEST_SECRET = secret("MAX_TOKENS_PER_REQUEST");
+// const DAILY_MESSAGE_LIMIT_SECRET = secret("DAILY_MESSAGE_LIMIT");
+// const DAILY_TOKEN_LIMIT_SECRET = secret("DAILY_TOKEN_LIMIT");
+// const MONTHLY_SESSION_LIMIT_SECRET = secret("MONTHLY_SESSION_LIMIT");
+// const MAX_MESSAGES_PER_SESSION_SECRET = secret("MAX_MESSAGES_PER_SESSION");
+// const MAX_TOKENS_PER_REQUEST_SECRET = secret("MAX_TOKENS_PER_REQUEST");
 
 export const FREE_TIER_LIMITS = {
-  DAILY_MESSAGE_LIMIT: parseInt(
-    DAILY_MESSAGE_LIMIT_SECRET() || process.env.DAILY_MESSAGE_LIMIT || "50"
-  ),
-  DAILY_TOKEN_LIMIT: parseInt(
-    DAILY_TOKEN_LIMIT_SECRET() || process.env.DAILY_TOKEN_LIMIT || "10000"
-  ),
-  MONTHLY_SESSION_LIMIT: parseInt(
-    MONTHLY_SESSION_LIMIT_SECRET() || process.env.MONTHLY_SESSION_LIMIT || "10"
-  ),
-  MAX_MESSAGES_PER_SESSION: parseInt(
-    MAX_MESSAGES_PER_SESSION_SECRET() || process.env.MAX_MESSAGES_PER_SESSION || "20"
-  ),
-  MAX_TOKENS_PER_REQUEST: parseInt(
-    MAX_TOKENS_PER_REQUEST_SECRET() || process.env.MAX_TOKENS_PER_REQUEST || "2000"
-  ),
+  // DAILY_MESSAGE_LIMIT: parseInt(
+  //   DAILY_MESSAGE_LIMIT_SECRET() || process.env.DAILY_MESSAGE_LIMIT || "50"
+  // ),
+  DAILY_MESSAGE_LIMIT: parseInt(process.env.DAILY_MESSAGE_LIMIT || "50"),
+  // DAILY_TOKEN_LIMIT: parseInt(
+  //   DAILY_TOKEN_LIMIT_SECRET() || process.env.DAILY_TOKEN_LIMIT || "10000"
+  // ),
+  DAILY_TOKEN_LIMIT: parseInt(process.env.DAILY_TOKEN_LIMIT || "10000"),
+  // MONTHLY_SESSION_LIMIT: parseInt(
+  //   MONTHLY_SESSION_LIMIT_SECRET() || process.env.MONTHLY_SESSION_LIMIT || "10"
+  // ),
+  MONTHLY_SESSION_LIMIT: parseInt(process.env.MONTHLY_SESSION_LIMIT || "10"),
+  // MAX_MESSAGES_PER_SESSION: parseInt(
+  //   MAX_MESSAGES_PER_SESSION_SECRET() || process.env.MAX_MESSAGES_PER_SESSION || "20"
+  // ),
+  MAX_MESSAGES_PER_SESSION: parseInt(process.env.MAX_MESSAGES_PER_SESSION || "20"),
+  // MAX_TOKENS_PER_REQUEST: parseInt(
+  //   MAX_TOKENS_PER_REQUEST_SECRET() || process.env.MAX_TOKENS_PER_REQUEST || "2000"
+  // ),
+  MAX_TOKENS_PER_REQUEST: parseInt(process.env.MAX_TOKENS_PER_REQUEST || "2000"),
 };
 
 export interface LimitCheckResult {

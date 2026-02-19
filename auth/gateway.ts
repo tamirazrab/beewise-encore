@@ -1,12 +1,12 @@
 import { Header, Gateway } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
 import { APIError } from "encore.dev/api";
-import { secret } from "encore.dev/config";
+// import { secret } from "encore.dev/config";
 import jwt from "jsonwebtoken";
 
-// Use Encore secrets with fallback to environment variables for local development
-const JWT_SECRET_SECRET = secret("JWT_SECRET");
-const JWT_SECRET = JWT_SECRET_SECRET() || process.env.JWT_SECRET || "change-me-in-production";
+// const JWT_SECRET_SECRET = secret("JWT_SECRET");
+// const JWT_SECRET = JWT_SECRET_SECRET() || process.env.JWT_SECRET || "change-me-in-production";
+const JWT_SECRET = process.env.JWT_SECRET || "change-me-in-production";
 
 interface AuthParams {
   authorization: Header<"Authorization">;
