@@ -4,6 +4,21 @@ import { getAuthData } from "~encore/auth";
 import { subscriptionDB } from "./db";
 import type { Subscription, SubscriptionStatusResponse, GetUserSubscriptionResponse } from "./types";
 
+/** Internal API for paid-ai-chat middleware: check if user has paid access. Not exposed to the internet. */
+export const checkPaidAccess = api(
+  { method: "POST", path: "/subscription/check-paid-access" },
+  async (req: { userId: string }): Promise<{ allowed: boolean }> => {
+    const subscription = await subscriptionDB.queryRow<{ plan_type: string }>`
+      SELECT plan_type
+      FROM subscription
+      WHERE user_id = ${req.userId}
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+    return { allowed: !!subscription && subscription.plan_type === "paid" };
+  }
+);
+
 export const getSubscriptionStatus = api(
   { method: "GET", path: "/subscription/status", auth: true },
   async (req: {}): Promise<SubscriptionStatusResponse> => {

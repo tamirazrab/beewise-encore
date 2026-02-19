@@ -1,8 +1,8 @@
 // Load environment variables from .env file
 import "dotenv/config";
 
-// Load gateway so auth handler and gateway are registered
-import "./gateway";
+// Load gateway so auth handler and gateway are registered (auth service)
+import "./auth/gateway";
 
 // Register all API endpoints, cron jobs, and pubsub subscriptions
 import "./auth/api";

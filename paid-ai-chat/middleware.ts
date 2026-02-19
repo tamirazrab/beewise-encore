@@ -2,7 +2,7 @@ import { middleware } from "encore.dev/api";
 import { APIError } from "encore.dev/api";
 import { currentRequest } from "encore.dev";
 import { getAuthData } from "~encore/auth";
-import { subscriptionDB } from "../subscription/db";
+import { subscription } from "~encore/clients";
 
 export const paidSubscriptionCheck = middleware(
   { target: { auth: true } },
@@ -18,17 +18,9 @@ export const paidSubscriptionCheck = middleware(
       throw APIError.unauthenticated("User ID not found");
     }
 
-    const subscription = await subscriptionDB.queryRow<{
-      plan_type: string;
-    }>`
-      SELECT plan_type
-      FROM subscription
-      WHERE user_id = ${userID}
-      ORDER BY created_at DESC
-      LIMIT 1
-    `;
+    const { allowed } = await subscription.checkPaidAccess({ userId: userID });
 
-    if (!subscription || subscription.plan_type !== "paid") {
+    if (!allowed) {
       throw APIError.permissionDenied(
         "Paid subscription required. Please upgrade your plan."
       );

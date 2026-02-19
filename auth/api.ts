@@ -1,3 +1,4 @@
+import "./gateway";
 import { api } from "encore.dev/api";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
